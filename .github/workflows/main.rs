@@ -4,7 +4,7 @@ use rand::Rng;
 
 #[tokio::main]
 async fn main() {
-    let target = "http://YOUR_TARGET_URL"; // এখানে লিংক দাও
+    let target = "https://myaura.xyz/"; // এখানে লিংক দাও
     
     // ব্রাউজারের মতো নিখুঁত হেডার
     let mut headers = header::HeaderMap::new();
